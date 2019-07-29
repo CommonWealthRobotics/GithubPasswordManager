@@ -19,12 +19,9 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.kohsuke.github.GitHub;
 
-import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.CleartextKeysetHandle;
 import com.google.crypto.tink.JsonKeysetReader;
 import com.google.crypto.tink.JsonKeysetWriter;
-import com.google.crypto.tink.KeysetHandle;
-import com.google.crypto.tink.aead.AeadKeyTemplates;
 import com.google.crypto.tink.config.TinkConfig;
 
 public class PasswordManager {
@@ -121,7 +118,7 @@ public class PasswordManager {
 	private static boolean hasnetwork;
 	private static boolean isLoggedIn = false;
 
-	static String getPassword() {
+	public static String getPassword() {
 		return pw;
 	}
 
@@ -137,7 +134,7 @@ public class PasswordManager {
 		return getLoginID();
 	}
 
-	static synchronized void login() throws IOException {
+	public static synchronized void login() throws IOException {
 		checkInternet();
 		if (!hasnetwork)
 			return;
