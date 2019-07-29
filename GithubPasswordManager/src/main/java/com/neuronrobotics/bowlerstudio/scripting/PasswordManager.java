@@ -223,7 +223,7 @@ public class PasswordManager {
 
 	public static GitHub setupAnyonmous() throws IOException {
 		System.err.println("Using anynomous login, autoupdate disabled");
-		ScriptingEngine.setAutoupdate(false);
+		
 		logout();
 		setGithub(GitHub.connectAnonymously());
 		
