@@ -271,7 +271,7 @@ public class PasswordManager {
 		String keysetFilename = keyfile.getAbsolutePath();
 		if(!keyfile.exists()) {
 			// Generate the key material...
-			System.err.println("Creating keyfile ");
+			//System.err.println("Creating keyfile ");
 			try {
 				keysetHandle = KeysetHandle.generateNew(
 				    AeadKeyTemplates.AES128_GCM);
@@ -284,7 +284,7 @@ public class PasswordManager {
 				e.printStackTrace();
 			}
 		}else {
-			System.err.println("Loading keyfile ");
+			//System.err.println("Loading keyfile ");
 			 try {
 				keysetHandle = CleartextKeysetHandle.read(
 				        JsonKeysetReader.withFile(new File(keysetFilename)));
