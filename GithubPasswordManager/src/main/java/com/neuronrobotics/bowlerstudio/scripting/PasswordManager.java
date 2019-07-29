@@ -235,7 +235,7 @@ public class PasswordManager {
 		loginManager = lm;
 	}
 
-	static void loadLoginData(File ws) throws Exception {
+	public static void loadLoginData(File ws) throws Exception {
 		workspace=ws;
 		usernamefile = new File(workspace.getAbsoluteFile()+"/username.json");
 		if(!usernamefile.exists())
