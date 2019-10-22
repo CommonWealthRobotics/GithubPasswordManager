@@ -10,5 +10,10 @@ public interface IGitHubLoginManager {
    */
   public String[] prompt(String loginID);
 
-
+  /**
+   * prompt the user for a 2 factor authentication code
+   * @return
+   */
+  public String twoFactorAuthCodePrompt();
+  
 }

@@ -44,8 +44,14 @@ public class PasswordManager {
 
 			do {
 				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+
 					creds[0] = buf.readLine();
-					System.out.println("GitHub Username: " + creds[0]);
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -56,12 +62,6 @@ public class PasswordManager {
 					return null;
 				}
 
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			} while (creds[0] == null);
 
 			// System.out.print("Github Password: ");
@@ -75,12 +75,29 @@ public class PasswordManager {
 				}
 				// creds[1] = buf.readLine();
 				if (creds[1].equals("")) {
-					System.out.println("No password, using anynomous login");
+					System.out.println("GitHub Password Cleartext:");
+					creds[1] = buf.readLine();
+					if (creds[1].equals("")) {
+						System.out.println("No password, using anynomous login");
+					}
 				}
 			} catch (Exception e) {
 				return null;
 			}
 			return creds;
+		}
+
+		@Override
+		public String twoFactorAuthCodePrompt() {
+			System.out.print("Github 2 factor temp key: ");
+			// create a scanner so we can read the command-line input
+			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+			// TODO Auto-generated method stub
+			try {
+				return buf.readLine().trim();
+			} catch (IOException e) {
+				return null;
+			}
 		}
 	};
 	static {
@@ -107,10 +124,11 @@ public class PasswordManager {
 			hasnetwork = false;
 		}
 	}
-	private static File usernamefile=null;
-	private static File passfile=null;
-	private static File keyfile=null;
-	private static File workspace=null;
+
+	private static File usernamefile = null;
+	private static File passfile = null;
+	private static File keyfile = null;
+	private static File workspace = null;
 	private static String loginID = null;
 	private static String pw = null;
 	private static CredentialsProvider cp;// = new
@@ -145,15 +163,21 @@ public class PasswordManager {
 			String[] creds = loginManager.prompt(PasswordManager.getUsername());
 			setLoginID(creds[0]);
 			pw = creds[1];
-			
+
+		}else {
 			try {
-				waitForLogin();
+				loadLoginData(getWorkspace());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
-		
+
+		try {
+			waitForLogin();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -163,11 +187,11 @@ public class PasswordManager {
 
 		if (!hasnetwork)
 			return;
-		if(loggedIn())
+		if (loggedIn())
 			return;
 		if (getLoginID() != null && pw != null) {
-			
-			performLogin( getLoginID(), pw);
+
+			performLogin(getLoginID(), pw);
 
 			if (getGithub() == null) {
 				System.out.println("\nERROR: Wrong Password!\n");
@@ -176,23 +200,39 @@ public class PasswordManager {
 
 		}
 	}
+
+	private static void performLogin(String u, String p) {
 	
-	private static void performLogin(String u,String p) {
-		try {
-			github=null;
-			GitHub gh = GitHub.connectUsingPassword(u, p);
-			if (gh.getRateLimit().remaining < 2) {
-				System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+			github = null;
+			GitHub gh=null;
+			try {
+				gh = GitHub.connectUsingPassword(u, p);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				if (gh.getRateLimit().remaining < 2) {
+					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+				}
+			}catch(Exception e) {
+				
+				//TODO This is where 2fa fails.
+				e.printStackTrace();
+				throw new RuntimeException("2 Factor Authentication is not supported yet, sorry");
 			}
 			setGithub(gh);
 			setCredentialProvider(new UsernamePasswordCredentialsProvider(u, p));
 			isLoggedIn = true;
-			writeData(u,p);
-			System.out.println("\n\nSuccess Login "+u+"\n\n");
-		}catch(Exception e) {
-			github=null;
-		}
-
+			try {
+				writeData(u, p);
+				System.out.println("\n\nSuccess Login " + u + "\n\n");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+	
 	}
 
 	public static boolean loggedIn() {
@@ -201,8 +241,8 @@ public class PasswordManager {
 
 	public static boolean hasStoredCredentials() {
 
-		if( usernamefile!=null && passfile!=null) {
-			return usernamefile.exists() && passfile.exists();
+		if (getUsernamefile() != null && getPassfile() != null) {
+			return getUsernamefile().exists() && getPassfile().exists();
 		}
 		return false;
 	}
@@ -211,19 +251,19 @@ public class PasswordManager {
 
 		setGithub(null);
 		isLoggedIn = false;
-		if(passfile!=null)
-			if(passfile.exists())
-				passfile.delete();
-		pw=null;
-		cp=null;
+		if (getPassfile() != null)
+			if (getPassfile().exists())
+				getPassfile().delete();
+		pw = null;
+		cp = null;
 	}
 
 	public static GitHub setupAnyonmous() throws IOException {
 		System.err.println("Using anynomous login, autoupdate disabled");
-		
+
 		logout();
 		setGithub(GitHub.connectAnonymously());
-		
+
 		return getGithub();
 	}
 
@@ -236,58 +276,54 @@ public class PasswordManager {
 	}
 
 	public static void loadLoginData(File ws) throws Exception {
-		workspace=ws;
-		usernamefile = new File(workspace.getAbsoluteFile()+"/username.json");
-		if(!usernamefile.exists())
-			usernamefile=null;
-		else {
-			List linesu = Files.readAllLines(Paths.get(usernamefile.toURI()),
-	                StandardCharsets.UTF_8);
+		setWorkspace(ws);
+
+		if (!getUsernamefile().exists()) {
+			//setUsernamefile(null);
+		} else {
+			List linesu = Files.readAllLines(Paths.get(getUsernamefile().toURI()), StandardCharsets.UTF_8);
 			setLoginID((String) linesu.get(0));
 		}
 		KeysetHandle keysetHandle = getKey();
-		passfile = new File(workspace.getAbsoluteFile()+"/timestamp.json");
-		if(!passfile.exists())
-			passfile=null;
-		if(hasStoredCredentials()) {
-	
-			byte [] passEncrypt=Files.readAllBytes(Paths.get(passfile.toURI()));
+//		if (!getPassfile().exists())
+//			setPassfile(null);
+		if (hasStoredCredentials()) {
+
+			byte[] passEncrypt = Files.readAllBytes(Paths.get(getPassfile().toURI()));
 			// 2. Get the primitive.
-		    Aead aead = keysetHandle.getPrimitive(Aead.class);
-		 // ... or to decrypt a ciphertext.
-		    try {
-			    byte[] decrypted = aead.decrypt(passEncrypt, null);
+			Aead aead = keysetHandle.getPrimitive(Aead.class);
+			// ... or to decrypt a ciphertext.
+			try {
+				byte[] decrypted = aead.decrypt(passEncrypt, null);
 				String cleartext = new String(decrypted).trim();
-				performLogin( getLoginID(), cleartext);
-		    }catch (GeneralSecurityException ex) {
-		    	ex.printStackTrace();
-		    	logout();
-		    }
+				performLogin(getLoginID(), cleartext);
+			} catch (GeneralSecurityException ex) {
+				ex.printStackTrace();
+				logout();
+			}
 		}
 	}
+
 	private static KeysetHandle getKey() throws IOException {
-		KeysetHandle keysetHandle=null;
-		keyfile = new File(workspace.getAbsoluteFile()+"/loadData.json");
+		KeysetHandle keysetHandle = null;
+		keyfile = new File(getWorkspace().getAbsoluteFile() + "/loadData.json");
 		String keysetFilename = keyfile.getAbsolutePath();
-		if(!keyfile.exists()) {
+		if (!keyfile.exists()) {
 			// Generate the key material...
-			//System.err.println("Creating keyfile ");
+			// System.err.println("Creating keyfile ");
 			try {
-				keysetHandle = KeysetHandle.generateNew(
-				    AeadKeyTemplates.AES128_GCM);
-			    // and write it to a file.
-			   
-			    CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withFile(
-			        new File(keysetFilename)));
+				keysetHandle = KeysetHandle.generateNew(AeadKeyTemplates.AES128_GCM);
+				// and write it to a file.
+
+				CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withFile(new File(keysetFilename)));
 			} catch (GeneralSecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else {
-			//System.err.println("Loading keyfile ");
-			 try {
-				keysetHandle = CleartextKeysetHandle.read(
-				        JsonKeysetReader.withFile(new File(keysetFilename)));
+		} else {
+			// System.err.println("Loading keyfile ");
+			try {
+				keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withFile(new File(keysetFilename)));
 			} catch (GeneralSecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -295,21 +331,20 @@ public class PasswordManager {
 		}
 		return keysetHandle;
 	}
-	private static void writeData(String user,String passcleartext) throws Exception {
+
+	private static void writeData(String user, String passcleartext) throws Exception {
 		setLoginID(user);
-		pw=passcleartext;
-		usernamefile = new File(workspace.getAbsoluteFile()+"/username.json");
-		if(!usernamefile.exists())
-			usernamefile.createNewFile();
-		Files.write(Paths.get(usernamefile.toURI()), user.getBytes());
+		pw = passcleartext;
+		if (!getUsernamefile().exists())
+			getUsernamefile().createNewFile();
+		Files.write(Paths.get(getUsernamefile().toURI()), user.getBytes());
 		KeysetHandle keysetHandle = getKey();
-		passfile = new File(workspace.getAbsoluteFile()+"/timestamp.json");	
-		if(!passfile.exists())
-			passfile.createNewFile();
+		if (!getPassfile().exists())
+			getPassfile().createNewFile();
 		// 2. Get the primitive.
-	    Aead aead = keysetHandle.getPrimitive(Aead.class);
+		Aead aead = keysetHandle.getPrimitive(Aead.class);
 		byte[] ciphertext = aead.encrypt(passcleartext.getBytes(), null);
-		Files.write(Paths.get(passfile.toURI()), ciphertext);
+		Files.write(Paths.get(getPassfile().toURI()), ciphertext);
 
 	}
 
@@ -322,7 +357,6 @@ public class PasswordManager {
 	}
 
 	public static boolean hasNetwork() {
-		// TODO Auto-generated method stub
 		return hasnetwork;
 	}
 
@@ -331,7 +365,30 @@ public class PasswordManager {
 	}
 
 	private static void setLoginID(String loginID) {
-		//new RuntimeException(loginID).printStackTrace();
+		// new RuntimeException(loginID).printStackTrace();
 		PasswordManager.loginID = loginID;
 	}
+
+	public static File getWorkspace() {
+		if (workspace == null)
+			workspace = new File(System.getProperty("user.home") + "/bowler-workspace/");
+		return workspace;
+	}
+
+	public static void setWorkspace(File workspace) {
+		PasswordManager.workspace = workspace;
+	}
+
+	public static File getUsernamefile() {
+		if (usernamefile == null)
+			usernamefile = new File(getWorkspace().getAbsoluteFile() + "/username.json");
+		return usernamefile;
+	}
+
+	public static File getPassfile() {
+		if (passfile == null)
+			passfile = (new File(getWorkspace().getAbsoluteFile() + "/timestamp.json"));
+		return passfile;
+	}
+
 }
