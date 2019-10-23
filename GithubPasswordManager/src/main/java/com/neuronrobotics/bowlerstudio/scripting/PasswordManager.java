@@ -216,10 +216,18 @@ public class PasswordManager {
 					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
 				}
 			}catch(Exception e) {
-				
-				//TODO This is where 2fa fails.
+				// since this doesn't work yet, fail with useful exception message
 				e.printStackTrace();
 				throw new RuntimeException("2 Factor Authentication is not supported yet, sorry");
+				/*
+				//TODO somehow prompt GitHub to send a 2fa account code
+				//TODO This is where 2fa fails.
+				//prompt the user for the code that github sent them
+				String twofaCoode = loginManager.twoFactorAuthCodePrompt();
+				//TODO set the token and re-login using the 2fa code
+				//gh =  GitHub.connectUsingPassword(u, p);// like this, but not this
+				*/	
+
 			}
 			setGithub(gh);
 			setCredentialProvider(new UsernamePasswordCredentialsProvider(u, p));
