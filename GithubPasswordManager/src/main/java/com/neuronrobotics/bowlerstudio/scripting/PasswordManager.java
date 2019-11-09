@@ -129,7 +129,7 @@ public class PasswordManager {
 			hasnetwork = false;
 		}
 	}
-
+	private static File tokenfile = null;
 	private static File usernamefile = null;
 	private static File passfile = null;
 	private static File keyfile = null;
@@ -218,41 +218,70 @@ public class PasswordManager {
 		else
 			token = gh.createTokenOtp(asList, string, "", OTP);
 		String p = token.getToken();
-		gh = GitHub.connectUsingPassword(username, p);
-		if (gh.getRateLimit().remaining < 2) {
-			System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
-		}
+		
 		return p;
 	}
 
-	private static void performLogin(String u, String p) {
+	private static void performLogin(String u, String p) throws Exception {
 
 		github = null;
 		GitHub gh = null;
+		String token=null;
 		try {
 			gh = GitHub.connectUsingPassword(u, p);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try {
-			p = makeToken(gh, u, null);
-		} catch (Exception e) {
-			String otpCode = loginManager.twoFactorAuthCodePrompt();
-			// TODO make the token request with the OTP
+		if(getTokenfile().exists()) {
+			byte[] passEncrypt = Files.readAllBytes(Paths.get(getTokenfile().toURI()));
+			// 2. Get the primitive.
+			Aead aead = getKey().getPrimitive(Aead.class);
+			// ... or to decrypt a ciphertext.
 			try {
-				p = makeToken(gh, u, otpCode);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				throw new RuntimeException("2fa authentication fail");
+				byte[] decrypted = aead.decrypt(passEncrypt, null);
+				token = new String(decrypted).trim();
+			} catch (GeneralSecurityException ex) {
+				ex.printStackTrace();
+				try {
+					logout();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return;
 			}
-
+		}else {
+			try {
+				token = makeToken(gh, u, null);
+			} catch (Exception e) {
+				String otpCode = loginManager.twoFactorAuthCodePrompt();
+				// TODO make the token request with the OTP
+				try {
+					token = makeToken(gh, u, otpCode);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					throw new RuntimeException("2fa authentication fail");
+				}
+	
+			}
+		}
+		
+		try {
+			gh = GitHub.connectUsingPassword(u, token);
+			if (gh.getRateLimit().remaining < 2) {
+				System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		setGithub(gh);
-		setCredentialProvider(new UsernamePasswordCredentialsProvider(u, p));
+		setCredentialProvider(new UsernamePasswordCredentialsProvider(u, token));
 		isLoggedIn = true;
 		try {
-			writeData(u, p);
+			writeData(u, token);
+			writeToken(u, token);
 			System.out.println("\n\nSuccess Login " + u + "\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -272,7 +301,9 @@ public class PasswordManager {
 		}
 		return false;
 	}
-
+	public static boolean hasStoredToken() {
+		return getUsernamefile().exists() && getTokenfile().exists();
+	}
 	public static void logout() throws IOException {
 
 		setGithub(null);
@@ -329,6 +360,7 @@ public class PasswordManager {
 			}
 		}
 	}
+	
 
 	private static KeysetHandle getKey() throws IOException {
 		KeysetHandle keysetHandle = null;
@@ -373,7 +405,21 @@ public class PasswordManager {
 		Files.write(Paths.get(getPassfile().toURI()), ciphertext);
 
 	}
+	private static void writeToken(String user, String passcleartext) throws Exception {
+		setLoginID(user);
+		pw = passcleartext;
+		if (!getUsernamefile().exists())
+			getUsernamefile().createNewFile();
+		Files.write(Paths.get(getUsernamefile().toURI()), user.getBytes());
+		KeysetHandle keysetHandle = getKey();
+		if (!getTokenfile().exists())
+			getTokenfile().createNewFile();
+		// 2. Get the primitive.
+		Aead aead = keysetHandle.getPrimitive(Aead.class);
+		byte[] ciphertext = aead.encrypt(passcleartext.getBytes(), null);
+		Files.write(Paths.get(getTokenfile().toURI()), ciphertext);
 
+	}
 	public static CredentialsProvider getCredentialProvider() {
 		return cp;
 	}
@@ -416,5 +462,10 @@ public class PasswordManager {
 			passfile = (new File(getWorkspace().getAbsoluteFile() + "/timestamp.json"));
 		return passfile;
 	}
-
+	
+	public static File getTokenfile() {
+		if (tokenfile == null)
+			tokenfile = (new File(getWorkspace().getAbsoluteFile() + "/token.json"));
+		return tokenfile;
+	}
 }
