@@ -13,6 +13,7 @@ public class loginTest {
 	@Test
 	public void test() {
 		try {
+			PasswordManager.logout();
 			PasswordManager.login();
 		} catch (IOException e) {
 			fail();

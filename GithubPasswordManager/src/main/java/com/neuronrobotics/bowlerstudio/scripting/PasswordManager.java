@@ -11,12 +11,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.KeysetHandle;
 import com.google.crypto.tink.aead.AeadKeyTemplates;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.kohsuke.github.GHAuthorization;
 import org.kohsuke.github.GitHub;
 
 import com.google.crypto.tink.CleartextKeysetHandle;
@@ -164,7 +169,7 @@ public class PasswordManager {
 			setLoginID(creds[0]);
 			pw = creds[1];
 
-		}else {
+		} else {
 			try {
 				loadLoginData(getWorkspace());
 			} catch (Exception e) {
@@ -200,47 +205,55 @@ public class PasswordManager {
 
 		}
 	}
+	
+	private static String makeToken(GitHub gh, String username) throws IOException {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+		String timestamp = dateFormat.format(new Date());
+		GHAuthorization token = gh.createToken(
+				Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages", "user","delete_repo"),
+				"BowlerStudio-" + timestamp, "");
+		String p = token.getToken();
+		gh = GitHub.connectUsingPassword(username, p);
+		if (gh.getRateLimit().remaining < 2) {
+			System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+		}
+		return p;
+	}
 
 	private static void performLogin(String u, String p) {
-	
-			github = null;
-			GitHub gh=null;
-			try {
-				gh = GitHub.connectUsingPassword(u, p);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-				if (gh.getRateLimit().remaining < 2) {
-					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
-				}
-			}catch(Exception e) {
-				// since this doesn't work yet, fail with useful exception message
-				e.printStackTrace();
-				throw new RuntimeException("2 Factor Authentication is not supported yet, sorry");
-				/*
-				//TODO somehow prompt GitHub to send a 2fa account code
-				//TODO This is where 2fa fails.
-				//prompt the user for the code that github sent them
-				String twofaCoode = loginManager.twoFactorAuthCodePrompt();
-				//TODO set the token and re-login using the 2fa code
-				//gh =  GitHub.connectUsingPassword(u, p);// like this, but not this
-				*/	
 
-			}
-			setGithub(gh);
-			setCredentialProvider(new UsernamePasswordCredentialsProvider(u, p));
-			isLoggedIn = true;
+		github = null;
+		GitHub gh = null;
+		try {
+			gh = GitHub.connectUsingPassword(u, p);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			p= makeToken( gh, u);
+		} catch (Exception e) {
+			String otpCode = loginManager.twoFactorAuthCodePrompt();
+			//TODO make the token request with the OTP
 			try {
-				writeData(u, p);
-				System.out.println("\n\nSuccess Login " + u + "\n\n");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				p= makeToken( gh, u);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				throw new RuntimeException("2fa authentication fail");
 			}
-			
-	
+
+		}
+		setGithub(gh);
+		setCredentialProvider(new UsernamePasswordCredentialsProvider(u, p));
+		isLoggedIn = true;
+		try {
+			writeData(u, p);
+			System.out.println("\n\nSuccess Login " + u + "\n\n");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public static boolean loggedIn() {
@@ -287,7 +300,7 @@ public class PasswordManager {
 		setWorkspace(ws);
 
 		if (!getUsernamefile().exists()) {
-			//setUsernamefile(null);
+			// setUsernamefile(null);
 		} else {
 			List linesu = Files.readAllLines(Paths.get(getUsernamefile().toURI()), StandardCharsets.UTF_8);
 			setLoginID((String) linesu.get(0));
