@@ -12,7 +12,7 @@ public interface IGitHubLoginManager {
 
   /**
    * prompt the user for a 2 factor authentication code
-   * @return
+   * @return a string containing the OTP code from the user
    */
   public String twoFactorAuthCodePrompt();
   

@@ -121,7 +121,7 @@ jar {
 
 group = "com.neuronrobotics"
 archivesBaseName = "GithubPasswordManager"
-version = "0.1.0"
+version = "0.1.2"
 
 shadowJar {
    baseName = archivesBaseName
