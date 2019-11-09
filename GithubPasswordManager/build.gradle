@@ -99,6 +99,11 @@ dependencies {
 	compile group: 'org.json', name: 'json', version: '20180813'
 	//compile group: 'org.kohsuke', name: 'github-api', version: '1.99'
 	compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.0.1.201506240215-r'
+	compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.5.1'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
+	compile 'commons-codec:commons-codec:1.13'
+	compile 'org.apache.commons:commons-lang3:3.9'
+	compile 'commons-io:commons-io:2.2'
 	implementation files('lib/github-api-1.100-SNAPSHOT.jar')
 	
 }
