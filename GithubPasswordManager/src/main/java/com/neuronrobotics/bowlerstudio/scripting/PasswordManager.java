@@ -205,13 +205,18 @@ public class PasswordManager {
 
 		}
 	}
-	
-	private static String makeToken(GitHub gh, String username) throws IOException {
+
+	private static String makeToken(GitHub gh, String username, String OTP) throws IOException {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 		String timestamp = dateFormat.format(new Date());
-		GHAuthorization token = gh.createToken(
-				Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages", "user","delete_repo"),
-				"BowlerStudio-" + timestamp, "");
+		List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
+				"user", "delete_repo");
+		String string = "BowlerStudio-" + timestamp;
+		GHAuthorization token;
+		if (OTP == null)
+			token = gh.createToken(asList, string, "");
+		else
+			token = gh.createTokenOtp(asList, string, "", OTP);
 		String p = token.getToken();
 		gh = GitHub.connectUsingPassword(username, p);
 		if (gh.getRateLimit().remaining < 2) {
@@ -231,12 +236,12 @@ public class PasswordManager {
 			e1.printStackTrace();
 		}
 		try {
-			p= makeToken( gh, u);
+			p = makeToken(gh, u, null);
 		} catch (Exception e) {
 			String otpCode = loginManager.twoFactorAuthCodePrompt();
-			//TODO make the token request with the OTP
+			// TODO make the token request with the OTP
 			try {
-				p= makeToken( gh, u);
+				p = makeToken(gh, u, otpCode);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				throw new RuntimeException("2fa authentication fail");
