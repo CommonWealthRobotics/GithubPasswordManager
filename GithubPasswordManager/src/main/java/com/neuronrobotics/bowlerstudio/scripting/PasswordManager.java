@@ -206,22 +206,6 @@ public class PasswordManager {
 		}
 	}
 
-	private static String makeToken(GitHub gh, String username, String OTP) throws IOException {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-		String timestamp = dateFormat.format(new Date());
-		List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
-				"user", "delete_repo");
-		String string = "BowlerStudio-" + timestamp;
-		GHAuthorization token;
-		if (OTP == null)
-			token = gh.createToken(asList, string, "");
-		else
-			token = gh.createTokenOtp(asList, string, "", OTP);
-		String p = token.getToken();
-		
-		return p;
-	}
-
 	private static void performLogin(String u, String p) throws Exception {
 
 		github = null;
@@ -252,19 +236,15 @@ public class PasswordManager {
 				return;
 			}
 		}else {
-			try {
-				token = makeToken(gh, u, null);
-			} catch (Exception e) {
-				String otpCode = loginManager.twoFactorAuthCodePrompt();
-				// TODO make the token request with the OTP
-				try {
-					token = makeToken(gh, u, otpCode);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					throw new RuntimeException("2fa authentication fail");
-				}
-	
-			}
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+			String timestamp = dateFormat.format(new Date());
+			List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
+					"user", "delete_repo");
+			String string = "BowlerStudio-" + timestamp;
+			GHAuthorization t=gh.createToken(asList, string, "",()->{
+				return loginManager.twoFactorAuthCodePrompt();
+			});
+			token=t.getToken();
 		}
 		
 		try {
