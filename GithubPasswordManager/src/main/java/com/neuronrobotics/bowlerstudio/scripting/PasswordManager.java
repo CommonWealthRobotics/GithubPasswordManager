@@ -291,6 +291,9 @@ public class PasswordManager {
 		if (getPassfile() != null)
 			if (getPassfile().exists())
 				getPassfile().delete();
+		if (getTokenfile() != null)
+			if (getTokenfile().exists())
+				getTokenfile().delete();
 		pw = null;
 		cp = null;
 	}
