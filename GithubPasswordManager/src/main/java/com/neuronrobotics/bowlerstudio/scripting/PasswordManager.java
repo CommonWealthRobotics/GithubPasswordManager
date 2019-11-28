@@ -129,10 +129,10 @@ public class PasswordManager {
 			hasnetwork = false;
 		}
 	}
-	private static File tokenfile = null;
-	private static File usernamefile = null;
-	private static File passfile = null;
-	private static File keyfile = null;
+//	private static File tokenfile = null;
+//	private static File usernamefile = null;
+//	private static File passfile = null;
+//	private static File keyfile = null;
 	private static File workspace = null;
 	private static String loginID = null;
 	private static String pw = null;
@@ -347,7 +347,7 @@ public class PasswordManager {
 
 	private static KeysetHandle getKey() throws IOException {
 		KeysetHandle keysetHandle = null;
-		keyfile = new File(getWorkspace().getAbsoluteFile() + "/loadData.json");
+		File keyfile = new File(getWorkspace().getAbsoluteFile() + "/loadData.json");
 		String keysetFilename = keyfile.getAbsolutePath();
 		if (!keyfile.exists()) {
 			// Generate the key material...
@@ -435,20 +435,16 @@ public class PasswordManager {
 	}
 
 	public static File getUsernamefile() {
-		if (usernamefile == null)
-			usernamefile = new File(getWorkspace().getAbsoluteFile() + "/username.json");
-		return usernamefile;
+		return new File(getWorkspace().getAbsoluteFile() + "/username.json");
 	}
 
 	public static File getPassfile() {
-		if (passfile == null)
-			passfile = (new File(getWorkspace().getAbsoluteFile() + "/timestamp.json"));
-		return passfile;
+
+		return new File(getWorkspace().getAbsoluteFile() + "/timestamp.json");
 	}
 	
 	public static File getTokenfile() {
-		if (tokenfile == null)
-			tokenfile = (new File(getWorkspace().getAbsoluteFile() + "/token.json"));
-		return tokenfile;
+
+		return new File(getWorkspace().getAbsoluteFile() + "/token.json");
 	}
 }
