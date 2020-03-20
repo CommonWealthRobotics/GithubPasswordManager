@@ -211,12 +211,7 @@ public class PasswordManager {
 		github = null;
 		GitHub gh = null;
 		String token=null;
-		try {
-			gh = GitHub.connectUsingPassword(u, p);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
 		if(getTokenfile().exists()) {
 			byte[] passEncrypt = Files.readAllBytes(Paths.get(getTokenfile().toURI()));
 			// 2. Get the primitive.
@@ -241,7 +236,7 @@ public class PasswordManager {
 			List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
 					"user", "delete_repo");
 			String string = "BowlerStudio-" + timestamp;
-			GHAuthorization t=gh.createToken(asList, string, "",()->{
+			GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(asList, string, "",()->{
 				return loginManager.twoFactorAuthCodePrompt();
 			});
 			token=t.getToken();
@@ -252,6 +247,8 @@ public class PasswordManager {
 			if (gh.getRateLimit().getRemaining() < 2) {
 				System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
 			}
+			u=gh.getMyself().getLogin();
+			setLoginID(u);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
