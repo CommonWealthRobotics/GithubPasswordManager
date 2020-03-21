@@ -140,7 +140,7 @@ public class PasswordManager {
 	private static GitHub github;
 	private static boolean hasnetwork;
 	private static boolean isLoggedIn = false;
-
+	private static boolean isAnonMode = false;
 	public static String getPassword() {
 		return pw;
 	}
@@ -265,11 +265,13 @@ public class PasswordManager {
 		}
 		setGithub(gh);
 		setCredentialProvider(new UsernamePasswordCredentialsProvider(u, token));
-		isLoggedIn = true;
+		
 		try {
 			writeData(u, token);
 			writeToken(u, token);
 			System.out.println("\n\nSuccess Login " + u + "\n\n");
+			isLoggedIn = true;
+			setAnonMode(false);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -310,7 +312,7 @@ public class PasswordManager {
 
 		logout();
 		setGithub(GitHub.connectAnonymously());
-		isLoggedIn=true;
+		setAnonMode(true);
 		return getGithub();
 	}
 
@@ -453,5 +455,13 @@ public class PasswordManager {
 	public static File getTokenfile() {
 
 		return new File(getWorkspace().getAbsoluteFile() + "/token.json");
+	}
+
+	public static boolean isAnonMode() {
+		return isAnonMode;
+	}
+
+	private static void setAnonMode(boolean isAnonMode) {
+		PasswordManager.isAnonMode = isAnonMode;
 	}
 }
