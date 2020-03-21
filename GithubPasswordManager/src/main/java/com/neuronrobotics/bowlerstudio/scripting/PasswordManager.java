@@ -166,8 +166,13 @@ public class PasswordManager {
 		boolean c2 = c && b;
 		if (c2) {
 			String[] creds = loginManager.prompt(PasswordManager.getUsername());
-			setLoginID(creds[0]);
-			pw = creds[1];
+			if(creds!=null) {
+				setLoginID(creds[0]);
+				pw = creds[1];
+			}else {
+				//anaon mode
+				setupAnyonmous() ;
+			}
 
 		} else {
 			try {
@@ -198,7 +203,7 @@ public class PasswordManager {
 
 			performLogin(getLoginID(), pw);
 
-			if (getGithub() == null) {
+			if (!isLoggedIn) {
 				System.out.println("\nERROR: Wrong Password!\n");
 				login();
 			}
@@ -236,10 +241,15 @@ public class PasswordManager {
 			List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
 					"user", "delete_repo");
 			String string = "BowlerStudio-" + timestamp;
-			GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(asList, string, "",()->{
-				return loginManager.twoFactorAuthCodePrompt();
-			});
-			token=t.getToken();
+			try {
+				GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(asList, string, "",()->{
+					return loginManager.twoFactorAuthCodePrompt();
+				});
+				token=t.getToken();
+			}catch(org.kohsuke.github.HttpException wrongpass) {
+				isLoggedIn=false;
+				return;
+			}
 		}
 		
 		try {
@@ -300,7 +310,7 @@ public class PasswordManager {
 
 		logout();
 		setGithub(GitHub.connectAnonymously());
-
+		isLoggedIn=true;
 		return getGithub();
 	}
 
