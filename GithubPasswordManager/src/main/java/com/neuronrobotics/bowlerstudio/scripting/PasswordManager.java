@@ -297,6 +297,7 @@ public class PasswordManager {
 
 		setGithub(null);
 		isLoggedIn = false;
+		isAnonMode = false;
 		if (getPassfile() != null)
 			if (getPassfile().exists())
 				getPassfile().delete();
