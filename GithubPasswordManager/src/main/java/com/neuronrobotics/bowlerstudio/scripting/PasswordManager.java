@@ -253,16 +253,18 @@ public class PasswordManager {
 		}
 		
 		try {
-			gh = GitHub.connectUsingPassword(u, token);
-			if (gh.getRateLimit().getRemaining() < 2) {
-				System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+			if(hasNetwork()) {
+				gh = GitHub.connectUsingPassword(u, token);
+				if (gh.getRateLimit().getRemaining() < 2) {
+					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+				}
+				u=gh.getMyself().getLogin();
 			}
-			u=gh.getMyself().getLogin();
-			setLoginID(u);
-		} catch (IOException e1) {
+		} catch (Throwable e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		setLoginID(u);
 		setGithub(gh);
 		setCredentialProvider(new UsernamePasswordCredentialsProvider(u, token));
 		
