@@ -33,7 +33,8 @@ import com.google.crypto.tink.config.TinkConfig;
 public class PasswordManager {
 	private static IGitHubLoginManager loginManager=null;
 	private static IGitHubLoginManager loginWebFlow = new GitHubWebFlow();
-	
+	public static List<String> listOfScopes = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
+			"user", "delete_repo");
 	private static IGitHubLoginManager loginHeadless = new IGitHubLoginManager() {
 
 		@Override
@@ -169,7 +170,7 @@ public class PasswordManager {
 		boolean c = !isLoggedIn;
 		boolean c2 = c && b;
 		if (c2) {
-			String[] creds = loginManager.prompt(PasswordManager.getUsername());
+			String[] creds = getLoginManager().prompt(PasswordManager.getUsername());
 			if(creds!=null) {
 				setLoginID(creds[0]);
 				pw = creds[1];
@@ -242,11 +243,10 @@ public class PasswordManager {
 		}else {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 			String timestamp = dateFormat.format(new Date());
-			List<String> asList = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
-					"user", "delete_repo");
+			
 			String string = "BowlerStudio-" + timestamp;
 			try {
-				GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(asList, string, "",()->{
+				GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(listOfScopes, string, "",()->{
 					return getLoginManager().twoFactorAuthCodePrompt();
 				});
 				token=t.getToken();
