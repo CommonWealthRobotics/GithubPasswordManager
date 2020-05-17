@@ -1,5 +1,6 @@
 package com.neuronrobotics.bowlerstudio.scripting;
 
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
@@ -30,7 +31,10 @@ import com.google.crypto.tink.JsonKeysetWriter;
 import com.google.crypto.tink.config.TinkConfig;
 
 public class PasswordManager {
-	private static IGitHubLoginManager loginManager = new IGitHubLoginManager() {
+	private static IGitHubLoginManager loginManager=null;
+	private static IGitHubLoginManager loginWebFlow = new GitHubWebFlow();
+	
+	private static IGitHubLoginManager loginHeadless = new IGitHubLoginManager() {
 
 		@Override
 		public String[] prompt(String username) {
@@ -243,7 +247,7 @@ public class PasswordManager {
 			String string = "BowlerStudio-" + timestamp;
 			try {
 				GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(asList, string, "",()->{
-					return loginManager.twoFactorAuthCodePrompt();
+					return getLoginManager().twoFactorAuthCodePrompt();
 				});
 				token=t.getToken();
 			}catch(org.kohsuke.github.HttpException wrongpass) {
@@ -320,6 +324,13 @@ public class PasswordManager {
 	}
 
 	public static IGitHubLoginManager getLoginManager() {
+		if(loginManager==null)
+			if (GraphicsEnvironment.isHeadless()) {
+				loginManager=loginHeadless;
+			} else {
+				loginManager=loginWebFlow;
+			}
+			
 		return loginManager;
 	}
 
