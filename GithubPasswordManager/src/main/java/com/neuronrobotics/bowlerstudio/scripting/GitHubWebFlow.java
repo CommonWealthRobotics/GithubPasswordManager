@@ -30,18 +30,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-//import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
-//import com.google.api.client.auth.oauth2.BearerToken;
-//import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
-//import com.google.api.client.auth.oauth2.TokenResponse;
-//import com.google.api.client.http.GenericUrl;
-//import com.google.api.client.http.HttpRequest;
-//import com.google.api.client.http.HttpRequestInitializer;
-//import com.google.api.client.http.HttpTransport;
-//import com.google.api.client.http.javanet.NetHttpTransport;
-//import com.google.api.client.json.JsonFactory;
-//import com.google.api.client.json.jackson2.JacksonFactory;
-
 /**
  * This Class is to allow for users to request a temporary login token that will
  * be used later to get an authorization token.
