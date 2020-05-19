@@ -204,7 +204,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		// Request parameters and other properties.
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("client_id",getMyAPI().get()));
-		params.add(new BasicNameValuePair("client_secret", mykey.get()));
+		params.add(new BasicNameValuePair("client_secret", getName().get()));
 		params.add(new BasicNameValuePair("code",code));
 		try {
 		    httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
