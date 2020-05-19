@@ -6,12 +6,14 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.neuronrobotics.bowlerstudio.scripting.GitHubWebFlow;
 import com.neuronrobotics.bowlerstudio.scripting.PasswordManager;
 
 public class loginTest {
 
 	@Test
 	public void test() {
+		GitHubWebFlow.setName(new APIProvider());
 		try {
 			PasswordManager.logout();
 			PasswordManager.login();

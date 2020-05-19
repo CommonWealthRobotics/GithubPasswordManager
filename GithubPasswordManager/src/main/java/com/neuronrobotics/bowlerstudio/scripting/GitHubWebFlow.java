@@ -65,7 +65,12 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 	private static Supplier<String> myAPI = () -> {
 		return "1edf79fae494c232d4d2";
 	};
-	private static Supplier<String> mykey =new APIProvider();
+	private static Supplier<String> myname =() -> {
+		JFrame jframe = new JFrame();
+		String answer = JOptionPane.showInputDialog(jframe, "Enter API secret");
+		jframe.dispose();
+		return answer;
+	};
 	String state ="";
 	@SuppressWarnings("serial")
 	@Override
@@ -250,11 +255,11 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 	}
 
 	public static Supplier<String> getName() {
-		return mykey;
+		return myname;
 	}
 
 	public static void setName(Supplier<String> mykey) {
-		GitHubWebFlow.mykey = mykey;
+		GitHubWebFlow.myname = mykey;
 	}
 
 }
