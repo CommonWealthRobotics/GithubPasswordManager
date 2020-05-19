@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 import javax.servlet.ServletException;
@@ -32,8 +29,6 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-
-import GithubPasswordManager.APIProvider;
 
 //import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 //import com.google.api.client.auth.oauth2.BearerToken;
