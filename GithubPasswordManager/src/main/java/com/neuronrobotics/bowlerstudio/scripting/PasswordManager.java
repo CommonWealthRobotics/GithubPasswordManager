@@ -260,7 +260,7 @@ public class PasswordManager {
 		
 		try {
 			if(hasNetwork()) {
-				gh = GitHub.connectUsingOAuth( p);
+				gh = GitHub.connectUsingPassword(u, token);
 				if (gh.getRateLimit().getRemaining() < 2) {
 					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
 				}
