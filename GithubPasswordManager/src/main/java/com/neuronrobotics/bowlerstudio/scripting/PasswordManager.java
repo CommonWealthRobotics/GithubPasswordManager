@@ -241,24 +241,26 @@ public class PasswordManager {
 				return;
 			}
 		}else {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-			String timestamp = dateFormat.format(new Date());
-			
-			String string = "BowlerStudio-" + timestamp;
-			try {
-				GHAuthorization t=GitHub.connectUsingPassword(u, p).createToken(listOfScopes, string, "",()->{
-					return getLoginManager().twoFactorAuthCodePrompt();
-				});
-				token=t.getToken();
-			}catch(org.kohsuke.github.HttpException wrongpass) {
-				isLoggedIn=false;
-				return;
-			}
+//			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+//			String timestamp = dateFormat.format(new Date());
+//			
+//			String string = "BowlerStudio-" + timestamp;
+//			try {
+//				GHAuthorization t=GitHub.connectUsingOAuth( p).createToken(listOfScopes, string, "",()->{
+//					return getLoginManager().twoFactorAuthCodePrompt();
+//				});
+//				token=t.getToken();
+//			}catch(org.kohsuke.github.HttpException wrongpass) {
+//				
+//				isLoggedIn=false;
+//				return;
+//			}
+			token=p;
 		}
 		
 		try {
 			if(hasNetwork()) {
-				gh = GitHub.connectUsingPassword(u, token);
+				gh = GitHub.connectUsingOAuth( p);
 				if (gh.getRateLimit().getRemaining() < 2) {
 					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
 				}

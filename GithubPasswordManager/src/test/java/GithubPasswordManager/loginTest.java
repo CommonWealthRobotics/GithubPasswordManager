@@ -15,6 +15,8 @@ public class loginTest {
 		try {
 			PasswordManager.logout();
 			PasswordManager.login();
+			if(!PasswordManager.loggedIn())
+				fail();
 		} catch (IOException e) {
 			fail();
 		}
