@@ -33,7 +33,7 @@ import com.google.crypto.tink.config.TinkConfig;
 public class PasswordManager {
 	private static IGitHubLoginManager loginManager=null;
 	private static IGitHubLoginManager loginWebFlow = new GitHubWebFlow();
-	public static List<String> listOfScopes = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
+	private static List<String> listOfScopes = Arrays.asList("repo", "gist", "write:packages", "read:packages", "delete:packages",
 			"user", "delete_repo");
 	private static IGitHubLoginManager loginHeadless = new IGitHubLoginManager() {
 
@@ -479,5 +479,13 @@ public class PasswordManager {
 
 	private static void setAnonMode(boolean isAnonMode) {
 		PasswordManager.isAnonMode = isAnonMode;
+	}
+
+	public static List<String> getListOfScopes() {
+		return listOfScopes;
+	}
+
+	public static void setListOfScopes(List<String> listOfScopes) {
+		PasswordManager.listOfScopes = listOfScopes;
 	}
 }

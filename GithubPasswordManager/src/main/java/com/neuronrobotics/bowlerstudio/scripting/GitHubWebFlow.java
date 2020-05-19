@@ -50,6 +50,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 	};
 	private static Supplier<String> myname =() -> {
 		JFrame jframe = new JFrame();
+		jframe.setAlwaysOnTop(true);
 		String answer = JOptionPane.showInputDialog(jframe, "Enter API secret");
 		jframe.dispose();
 		return answer;
@@ -58,12 +59,11 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 	@SuppressWarnings("serial")
 	@Override
 	public String[] prompt(String loginID) {
-		if(loginID ==null) {
-			JFrame jframe = new JFrame();
-			loginID = JOptionPane.showInputDialog(jframe, "Github User Name ");
-			jframe.dispose();
-			//loginID="madhephaestus";
-		}
+		JFrame jframe = new JFrame();
+		jframe.setAlwaysOnTop(true);
+		loginID = JOptionPane.showInputDialog(jframe, "Github User Name ",loginID==null?"":loginID);
+		jframe.dispose();
+
 		String id = loginID;
 		Server server = new Server(WEBSERVER_PORT);
 		
@@ -82,13 +82,8 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 						throws ServletException, IOException {
 					try {
 						final String code = request.getParameter("code");
-						final String tok = request.getParameter("access_token");
-						if (tok != null) {
-							response.setStatus(HttpServletResponse.SC_OK);
-							returnData = new String[] { id, tok };
-						}
 						if(code !=null) {
-							response.setStatus(HttpServletResponse.SC_OK);
+							response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 							runStep2(id, code);
 							
 						}
@@ -97,6 +92,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 
 					} finally {
 						response.setContentType("text/html;charset=UTF-8");
+						
 						response.getWriter().println("");
 						response.getWriter().close();
 					}
@@ -146,7 +142,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		"allow_signup=true" + "&" + 
 		//"state="+generatedString + "&" +
 		"scope=";
-		List<String> listOfScopes = PasswordManager.listOfScopes;
+		List<String> listOfScopes = PasswordManager.getListOfScopes();
 		for (int i = 0; i < listOfScopes.size(); i++) {
 			String scope = listOfScopes.get(i);
 			scope = scope.replaceAll(":", "%3A");
