@@ -151,7 +151,6 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 				doRequest +=  "%20";
 		}
 		doRequest = doRequest.trim();
-		System.out.println(doRequest);
 		// Send request in step 1
 		// https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#1-request-a-users-github-identity
 		// User interaction is needed to approve the authorization
