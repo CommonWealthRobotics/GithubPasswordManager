@@ -1,6 +1,6 @@
 package com.neuronrobotics.bowlerstudio.scripting;
 
-import java.awt.Desktop;
+//import java.awt.Desktop;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -54,6 +54,8 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		String answer = JOptionPane.showInputDialog(jframe, "Enter API secret");
 		jframe.dispose();
 		return answer;
+	};
+	private static IURLOpen open = new IURLOpen() {
 	};
 	String state ="";
 	@SuppressWarnings("serial")
@@ -156,20 +158,12 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		// User interaction is needed to approve the authorization
 		// Open this URL in a desktop browser
 		try {
-			if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
-				try {
-					Desktop.getDesktop().browse(new URI(doRequest));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			getOpen().open(new URI(doRequest));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
 	}
 	private void runStep2(String id, final String code) {
 		// Now perform step 2
@@ -238,6 +232,12 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 
 	public static void setName(Supplier<String> mykey) {
 		GitHubWebFlow.myname = mykey;
+	}
+	public static IURLOpen getOpen() {
+		return open;
+	}
+	public static void setOpen(IURLOpen open) {
+		GitHubWebFlow.open = open;
 	}
 
 }
