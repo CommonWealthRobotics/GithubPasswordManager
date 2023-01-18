@@ -42,7 +42,7 @@ task sourcesJar(type: Jar) {
 artifacts {
 	archives javadocJar, sourcesJar, jar
 }
-
+/*
 signing {
 	sign configurations.archives
 }
@@ -90,3 +90,5 @@ uploadArchives {
 	  }
 	}
   }
+
+*/
