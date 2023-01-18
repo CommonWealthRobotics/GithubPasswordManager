@@ -261,12 +261,16 @@ public class PasswordManager {
 		try {
 			if(hasNetwork()) {
 				gh = GitHub.connect(u, token);
-				if (gh.getRateLimit().getRemaining() < 2) {
-					System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+				try {
+					if (gh.getRateLimit().getRemaining() < 2) {
+						System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+					}
+				}catch(java.lang.NoSuchMethodError er) {
+					er.printStackTrace();
 				}
 				u=gh.getMyself().getLogin();
 			}
-		} catch (Exception e1) {
+		} catch (Throwable e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			logout();
