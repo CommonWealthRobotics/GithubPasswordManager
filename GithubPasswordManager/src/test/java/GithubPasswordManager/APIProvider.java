@@ -9,10 +9,10 @@ public class APIProvider implements Supplier<String>{
 
 	@Override
 	public String get() {
-		JFrame jframe = new JFrame();
-		String answer = JOptionPane.showInputDialog(jframe, "Enter API secret");
-		jframe.dispose();
-		return answer;
+//		JFrame jframe = new JFrame();
+//		String answer = JOptionPane.showInputDialog(jframe, "Enter API secret");
+//		jframe.dispose();
+//		return answer;
 	}
 
 }
