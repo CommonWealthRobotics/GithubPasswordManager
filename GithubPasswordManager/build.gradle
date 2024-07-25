@@ -20,7 +20,7 @@ dependencies {
 	implementation 'com.google.crypto.tink:tink:1.3.0-rc1'
 	api group: 'org.kohsuke', name: 'github-api', version: '1.101'
 // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit.ssh.apache
-implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '5.13.1.202206130422-r'
+api group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '5.13.1.202206130422-r'
 
 
 // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
