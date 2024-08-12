@@ -12,8 +12,6 @@ sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
-	//jcenter()
-	//google()
 }
 dependencies {
 	testImplementation 'junit:junit:4.10'
