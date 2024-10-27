@@ -46,8 +46,8 @@ public class PasswordManager {
 					username = null;
 			}
 			String[] creds = new String[] { "", "" };
-			System.out.println("#Github Login Prompt#");
-			System.out.println("For anynomous mode hit enter twice");
+			//System.out.println("#Github Login Prompt#");
+			//System.out.println("For anynomous mode hit enter twice");
 			System.out.print("Github Username: " + (username != null ? "(" + username + ")" : ""));
 			// create a scanner so we can read the command-line input
 			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
@@ -68,7 +68,7 @@ public class PasswordManager {
 					return null;
 				}
 				if (creds[0].equals("") && (username == null)) {
-					System.out.println("No username, using anynomous login");
+					//System.out.println("No username, using anynomous login");
 					return null;
 				}
 
@@ -85,10 +85,10 @@ public class PasswordManager {
 				}
 				// creds[1] = buf.readLine();
 				if (creds[1].equals("")) {
-					System.out.println("GitHub Password Cleartext:");
+					//System.out.println("GitHub Password Cleartext:");
 					creds[1] = buf.readLine();
 					if (creds[1].equals("")) {
-						System.out.println("No password, using anynomous login");
+						//System.out.println("No password, using anynomous login");
 					}
 				}
 			} catch (Exception e) {
@@ -209,7 +209,7 @@ public class PasswordManager {
 			performLogin(getLoginID(), pw);
 
 			if (!isLoggedIn) {
-				System.out.println("\nERROR: Wrong Password!\n");
+				//System.out.println("\nERROR: Wrong Password!\n");
 				login();
 			}
 
@@ -263,7 +263,7 @@ public class PasswordManager {
 				gh = GitHub.connect(u, token);
 				try {
 					if (gh.getRateLimit().getRemaining() < 2) {
-						System.err.println("##Github Is Rate Limiting You## Disabling autoupdate");
+						//System.out.println("##Github Is Rate Limiting You## Disabling autoupdate");
 					}
 				}catch(java.lang.NoSuchMethodError er) {
 					er.printStackTrace();
@@ -283,7 +283,7 @@ public class PasswordManager {
 		try {
 			writeData(u, token);
 			writeToken(u, token);
-			System.out.println("\n\nSuccess Login " + u + "\n\n");
+			//System.out.println("\n\nSuccess Login " + u + "\n\n");
 			isLoggedIn = true;
 			setAnonMode(false);
 		} catch (Exception e) {
@@ -323,7 +323,7 @@ public class PasswordManager {
 	}
 
 	public static GitHub setupAnyonmous() throws IOException {
-		System.err.println("Using anynomous login, autoupdate disabled");
+		//System.out.println("Using anynomous login, autoupdate disabled");
 
 		logout();
 		setGithub(GitHub.connectAnonymously());
@@ -382,7 +382,7 @@ public class PasswordManager {
 		String keysetFilename = keyfile.getAbsolutePath();
 		if (!keyfile.exists()) {
 			// Generate the key material...
-			// System.err.println("Creating keyfile ");
+			// //System.out.println("Creating keyfile ");
 			try {
 				keysetHandle = KeysetHandle.generateNew(AeadKeyTemplates.AES128_GCM);
 				// and write it to a file.
@@ -393,7 +393,7 @@ public class PasswordManager {
 				e.printStackTrace();
 			}
 		} else {
-			// System.err.println("Loading keyfile ");
+			// //System.out.println("Loading keyfile ");
 			try {
 				keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withFile(new File(keysetFilename)));
 			} catch (GeneralSecurityException e) {

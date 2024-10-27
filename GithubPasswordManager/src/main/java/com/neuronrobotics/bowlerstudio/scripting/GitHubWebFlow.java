@@ -198,7 +198,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		        	String [] keys = content[0].split("=");
 		        	if(keys!=null && keys.length>1) {
 		        		String string = keys[1];
-						//System.out.println("Key = "+string);
+						//com.neuronrobotics.sdk.common.Log.error("Key = "+string);
 		        		returnData= new String[] {id,string};
 		        	}
 		        }
