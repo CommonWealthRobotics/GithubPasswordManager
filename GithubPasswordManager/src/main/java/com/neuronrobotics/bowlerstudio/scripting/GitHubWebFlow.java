@@ -117,20 +117,20 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 					break;
 				}
 
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			server.stop();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 		return returnData;
@@ -160,7 +160,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 		try {
 			getOpen().open(new URI(doRequest));
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -214,7 +214,7 @@ public class GitHubWebFlow implements IGitHubLoginManager {
 	}
 	@Override
 	public String twoFactorAuthCodePrompt() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 		return null;
 	}
 

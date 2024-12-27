@@ -10,7 +10,7 @@ public interface IURLOpen {
 			try {
 				Desktop.getDesktop().browse(toOpe);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
 	}

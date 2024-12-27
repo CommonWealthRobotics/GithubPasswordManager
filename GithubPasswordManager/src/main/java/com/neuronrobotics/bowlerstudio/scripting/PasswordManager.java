@@ -56,7 +56,7 @@ public class PasswordManager {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				}
 				try {
@@ -102,7 +102,7 @@ public class PasswordManager {
 			System.out.print("Github 2 factor temp key: ");
 			// create a scanner so we can read the command-line input
 			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
-			// TODO Auto-generated method stub
+			// Auto-generated method stub
 			try {
 				return buf.readLine().trim();
 			} catch (IOException e) {
@@ -116,7 +116,7 @@ public class PasswordManager {
 		try {
 			TinkConfig.register();
 		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -190,7 +190,7 @@ public class PasswordManager {
 		try {
 			waitForLogin();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -235,7 +235,7 @@ public class PasswordManager {
 				try {
 					logout();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				}
 				return;
@@ -271,7 +271,7 @@ public class PasswordManager {
 				u=gh.getMyself().getLogin();
 			}
 		} catch (Throwable e1) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e1.printStackTrace();
 			logout();
 			return;
@@ -287,7 +287,7 @@ public class PasswordManager {
 			isLoggedIn = true;
 			setAnonMode(false);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -389,7 +389,7 @@ public class PasswordManager {
 
 				CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withFile(new File(keysetFilename)));
 			} catch (GeneralSecurityException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
@@ -397,7 +397,7 @@ public class PasswordManager {
 			try {
 				keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withFile(new File(keysetFilename)));
 			} catch (GeneralSecurityException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
