@@ -12,6 +12,8 @@
 
 # Package Files #
 *.jar
+# ...except the Gradle wrapper, which must be committed to make ./gradlew work
+!**/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
