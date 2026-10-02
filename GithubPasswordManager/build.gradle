@@ -86,3 +86,39 @@ publishing {
 signing {
 	sign publishing.publications.mavenJava
 }
+
+// Regenerate after any dependency change:
+//   ./gradlew --write-locks lockClasspaths
+allprojects {
+	dependencyLocking {
+		lockAllConfigurations()
+	}
+}
+
+def lockedConfigurations = [
+	'annotationProcessor',
+	'compileClasspath',
+	'runtimeClasspath',
+	'testCompileClasspath',
+	'testRuntimeClasspath',
+]
+
+allprojects {
+	tasks.register('lockClasspaths') {
+		group = 'build'
+		description = 'Resolve the locked configurations so --write-locks records them'
+		doLast {
+			lockedConfigurations.each { n ->
+				def c = configurations.findByName(n)
+				if (c != null && c.canBeResolved) {
+					try {
+						c.resolve()
+					} catch (Throwable ignored) {
+						// A configuration that cannot resolve is still recorded by
+						// --write-locks; failure here must not abort the task.
+					}
+				}
+			}
+		}
+	}
+}
